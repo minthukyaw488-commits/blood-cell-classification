@@ -60,20 +60,28 @@ transform = transforms.Compose([
 
 # ── Load model ────────────────────────────────────────────────────────────────
 def load_model():
-    model = timm.create_model("efficientnet_b3", pretrained=False, num_classes=len(CLASS_NAMES))
     checkpoint = torch.load(MODEL_PATH, map_location=DEVICE)
-    if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
-        model.load_state_dict(checkpoint["model_state_dict"])
-    else:
-        model.load_state_dict(checkpoint)
+    state_dict = checkpoint["model_state_dict"] if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint else checkpoint
+
+    # Auto-detect number of classes from the saved classifier layer
+    num_classes = state_dict["classifier.weight"].shape[0]
+    if num_classes != len(CLASS_NAMES):
+        print(f"Warning: checkpoint has {num_classes} classes, CLASS_NAMES has {len(CLASS_NAMES)}. "
+              f"Using {num_classes} classes from checkpoint.")
+
+    model = timm.create_model("efficientnet_b3", pretrained=False, num_classes=num_classes)
+    model.load_state_dict(state_dict)
     model.to(DEVICE)
     model.eval()
-    return model
+    return model, num_classes
 
 try:
-    model = load_model()
+    model, NUM_CLASSES = load_model()
+    # Trim CLASS_NAMES to match the checkpoint if needed
+    CLASS_NAMES = CLASS_NAMES[:NUM_CLASSES]
     MODEL_LOADED = True
 except FileNotFoundError:
+    model, NUM_CLASSES = None, len(CLASS_NAMES)
     MODEL_LOADED = False
     print(f"Warning: '{MODEL_PATH}' not found. Upload or place it next to app.py.")
 
