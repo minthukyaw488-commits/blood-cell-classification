@@ -177,3 +177,8 @@ All key hyperparameters live in `src/config.py`:
 ## License
 
 This project is licensed under the MIT License.
+
+## Author
+
+**NOVEM (MIN THU KYAW)**
+Medical AI · Konyang University, Daejeon, South Korea
