@@ -6,6 +6,8 @@
 
 Automated 8-class blood cell subtype classification using EfficientNetB3 with two-phase transfer learning in PyTorch.
 
+[![Hugging Face](https://img.shields.io/badge/🤗-Demo-yellow)](https://huggingface.co/spaces/novemtk18)
+
 ## Table of Contents
 
 - [Overview](#overview)
